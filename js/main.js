@@ -25,89 +25,94 @@ async function init() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.5;
+    renderer.toneMappingExposure = 1.2; // Ajustado para el nuevo suelo
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     document.getElementById('contenedor-3d').appendChild(renderer.domElement);
 
     escena = new THREE.Scene();
-    escena.background = new THREE.Color(0x1a1a2e);
+    escena.background = new THREE.Color(0x0f172a); // Fondo más oscuro y profesional
     escena.environment = crearEntorno(renderer);
 
-    camara = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
+    camara = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
     camara.position.set(3.5, 2.2, 5.5);
     controls = new OrbitControls(camara, renderer.domElement);
     controls.target.set(0, -0.3, 0);
     controls.enableDamping = true;
 
-    // Luces
-    escena.add(new THREE.AmbientLight(0x8899bb, 1.8));
-    const sol = new THREE.DirectionalLight(0xfff5e6, 5);
+    // --- ILUMINACIÓN MEJORADA ---
+    escena.add(new THREE.AmbientLight(0x8899bb, 1.2));
+    
+    const sol = new THREE.DirectionalLight(0xfff5e6, 4);
     sol.position.set(6, 10, 4);
     sol.castShadow = true;
-    sol.shadow.mapSize.set(2048,2048);
-    sol.shadow.camera.near = 0.5; sol.shadow.camera.far = 25;
+    sol.shadow.mapSize.set(2048, 2048);
     escena.add(sol);
-    // Luz de relleno (corregido)
-    const luzRelleno = new THREE.DirectionalLight(0xccddff, 1.5);
-    luzRelleno.position.set(-3, 1, -2);
-    escena.add(luzRelleno);
 
-    // Suelo de laboratorio
-    const canvas = document.createElement('canvas');
-    canvas.width = 512; canvas.height = 512;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#2c3e50';
-    ctx.fillRect(0,0,512,512);
-    ctx.strokeStyle = '#1a252f';
-    ctx.lineWidth = 2;
-    for (let i=0; i<=512; i+=64) {
-        ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,512); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(512,i); ctx.stroke();
-    }
-    const texturaSuelo = new THREE.CanvasTexture(canvas);
-    texturaSuelo.wrapS = texturaSuelo.wrapT = THREE.RepeatWrapping;
-    texturaSuelo.repeat.set(4,4);
-    const suelo = new THREE.Mesh(new THREE.PlaneGeometry(10,10), new THREE.MeshStandardMaterial({ map: texturaSuelo, roughness: 0.9, metalness: 0.1 }));
-    suelo.rotation.x = -Math.PI/2;
+    const luzAzulada = new THREE.PointLight(0x3b82f6, 10, 10);
+    luzAzulada.position.set(-4, 2, 2);
+    escena.add(luzAzulada);
+
+    // --- SUELO DE LABORATORIO REFLECTANTE ---
+    const gridHelper = new THREE.GridHelper(20, 40, 0x4a5568, 0x2d3748);
+    gridHelper.position.y = -1.79; 
+    escena.add(gridHelper);
+
+    const sueloGeo = new THREE.PlaneGeometry(30, 30);
+    const sueloMat = new THREE.MeshStandardMaterial({ 
+        color: 0x1a202c, 
+        roughness: 0.15, 
+        metalness: 0.5 
+    });
+    const suelo = new THREE.Mesh(sueloGeo, sueloMat);
+    suelo.rotation.x = -Math.PI / 2;
     suelo.position.y = -1.8;
     suelo.receiveShadow = true;
     escena.add(suelo);
 
-    // Carga del modelo 3D
-    const gltf = await new GLTFLoader().loadAsync('../impact_testing_machine_charpy/scene.gltf');
-    modelo = gltf.scene;
-    modelo.scale.set(0.5,0.5,0.5);
-    const box = new THREE.Box3().setFromObject(modelo);
-    modelo.position.set(0, -1.8 - box.min.y, 0);
-    escena.add(modelo);
+    // --- CARGA DEL MODELO ---
+    try {
+        const gltf = await new GLTFLoader().loadAsync('../impact_testing_machine_charpy/scene.gltf');
+        modelo = gltf.scene;
+        modelo.scale.set(0.5, 0.5, 0.5);
+        const box = new THREE.Box3().setFromObject(modelo);
+        modelo.position.set(0, -1.8 - box.min.y, 0);
+        escena.add(modelo);
 
-    modelo.traverse(child => {
-        if (child.isMesh) {
-            child.castShadow = child.receiveShadow = true;
-            if (child.material) {
-                child.material.roughness = Math.min(child.material.roughness||0.5, 0.6);
-                child.material.metalness = Math.max(child.material.metalness||0.3, 0.6);
+        modelo.traverse(child => {
+            if (child.isMesh) {
+                child.castShadow = child.receiveShadow = true;
+                if (child.material) {
+                    child.material.roughness = Math.min(child.material.roughness || 0.5, 0.6);
+                    child.material.metalness = Math.max(child.material.metalness || 0.3, 0.6);
+                }
             }
-        }
-    });
+        });
 
-    // Ocultar probeta original y colocar la nuestra
-    let probetaOriginal = null;
-    modelo.traverse(child => {
-        if (child.isMesh && child.material?.color?.getHex() === 0xff0000) probetaOriginal = child;
-    });
-    if (probetaOriginal) probetaOriginal.visible = false;
-    const posProbeta = probetaOriginal ? probetaOriginal.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3(0, -1.35, 0.2);
-    probeta = crearProbeta(escena, posProbeta, modelo.scale.clone());
+        let probetaOriginal = null;
+        modelo.traverse(child => {
+            if (child.isMesh && child.material?.color?.getHex() === 0xff0000) probetaOriginal = child;
+        });
+        if (probetaOriginal) probetaOriginal.visible = false;
+        const posProbeta = probetaOriginal ? probetaOriginal.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3(0, -1.35, 0.2);
+        probeta = crearProbeta(escena, posProbeta, modelo.scale.clone());
 
-    // AnimationMixer
-    mixer = new THREE.AnimationMixer(modelo);
-    action = mixer.clipAction(gltf.animations[0]);
-    action.play();
-    action.paused = true;
+        mixer = new THREE.AnimationMixer(modelo);
+        action = mixer.clipAction(gltf.animations[0]);
+        action.play();
+        action.paused = true;
+    } catch (error) {
+        console.error("Error cargando el modelo:", error);
+    }
 
-    // UI
+    // --- INTERFAZ Y EVENTOS ---
     llenarMaterialesAgrupados();
+    configurarEventosUI();
+
+    initChart();
+    animar();
+}
+
+function configurarEventosUI() {
     document.getElementById('angulo').addEventListener('input', e => {
         anguloInicial = +e.target.value;
         document.getElementById('valor-angulo').textContent = anguloInicial + '°';
@@ -134,17 +139,11 @@ async function init() {
     document.getElementById('btn-educativo').onclick = () => document.getElementById('panel-educativo').classList.remove('oculto');
     document.getElementById('cerrar-educativo').onclick = () => document.getElementById('panel-educativo').classList.add('oculto');
 
-    // Calibración del impacto
-    let tiempoImpacto = 4.585;
-    setTiempoImpacto(tiempoImpacto);
     document.getElementById('slider-impacto').addEventListener('input', e => {
-        tiempoImpacto = +e.target.value;
-        document.getElementById('valor-impacto').textContent = tiempoImpacto.toFixed(3);
+        const val = +e.target.value;
+        document.getElementById('valor-impacto').textContent = val.toFixed(3);
+        setTiempoImpacto(val);
     });
-    document.getElementById('btn-aplicar-calibracion').onclick = () => setTiempoImpacto(tiempoImpacto);
-
-    initChart();
-    animar();
 }
 
 function llenarMaterialesAgrupados() {
@@ -174,23 +173,49 @@ function animar() {
     if (mixer) mixer.update(delta);
     controls.update();
 
-    // Vibración de cámara con intensidad variable
+    // Vibración de cámara
     if (window.camaraShake && window.camaraShakeFrames > 0) {
         const intensidad = window.camaraShakeIntensidad || 0.02;
         camara.position.x += (Math.random() - 0.5) * intensidad;
         camara.position.y += (Math.random() - 0.5) * intensidad;
         window.camaraShakeFrames--;
-        if (window.camaraShakeFrames <= 0) {
-            window.camaraShake = false;
-        }
+        if (window.camaraShakeFrames <= 0) window.camaraShake = false;
     }
+
+    // --- FÍSICAS DE PARTÍCULAS MEJORADAS ---
+    const NIVEL_SUELO = -1.8;
+    const REBOTE = 0.4; 
+    const FRICCION = 0.95; 
 
     if (probeta?.particulas) {
         for (let i = probeta.particulas.length - 1; i >= 0; i--) {
             const p = probeta.particulas[i];
-            p.position.add(p.userData.vel.clone().multiplyScalar(0.016));
-            p.userData.vel.y -= 0.005;
-            if (p.position.y < -2) {
+            
+            // Gravedad
+            p.userData.vel.y -= 9.81 * delta; 
+            
+            // Movimiento
+            p.position.add(p.userData.vel.clone().multiplyScalar(delta));
+
+            // Rotación natural
+            if (p.userData.vel.lengthSq() > 0.01) {
+                p.rotation.x += p.userData.vel.z * delta * 5;
+                p.rotation.y += p.userData.vel.x * delta * 5;
+            }
+
+            // Colisión con suelo
+            if (p.position.y <= NIVEL_SUELO) {
+                p.position.y = NIVEL_SUELO;
+                p.userData.vel.y *= -REBOTE; 
+                p.userData.vel.x *= FRICCION;
+                p.userData.vel.z *= FRICCION;
+
+                if (Math.abs(p.userData.vel.y) < 0.1) p.userData.vel.y = 0;
+            }
+
+            // Vida útil de partículas
+            p.userData.vida = (p.userData.vida || 0) + delta;
+            if (p.userData.vida > 8) {
                 escena.remove(p);
                 probeta.particulas.splice(i, 1);
             }
@@ -203,13 +228,16 @@ async function iniciarEnsayo() {
     if (ensayando) return;
     ensayando = true;
     document.getElementById('btn-iniciar').disabled = true;
+    
     const eIni = calcularEnergiaInicial(anguloInicial);
     document.getElementById('e-inicial').textContent = eIni.toFixed(2) + ' J';
+    
     animarPendulo(mixer, action, anguloInicial, matSel, probeta, temperatura, (absorbida, tipo) => {
         const res = calcularResiliencia(absorbida);
         document.getElementById('e-absorbida').textContent = absorbida.toFixed(2) + ' J';
         document.getElementById('resiliencia').textContent = res.toFixed(2) + ' J/cm²';
         document.getElementById('tipo-fractura').textContent = tipo;
+        
         ultimoEnsayo = {
             material: matSel.nombre,
             angulo: anguloInicial,
@@ -221,6 +249,7 @@ async function iniciarEnsayo() {
             resiliencia: res.toFixed(2),
             tipoFractura: tipo
         };
+        
         updateChart(`${matSel.nombre}`, absorbida);
         document.getElementById('btn-iniciar').disabled = false;
         ensayando = false;
@@ -237,9 +266,9 @@ function reiniciar() {
 }
 
 window.addEventListener('resize', () => {
-    camara.aspect = innerWidth / innerHeight;
+    camara.aspect = window.innerWidth / window.innerHeight;
     camara.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
 init().catch(console.error);
