@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador Charpy 3D | Ingeniería de Materiales</title>
+    <link rel="stylesheet" href="css/estilo.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="contenedor-3d"></div>
+
+    <!-- Panel de control principal -->
+    <div id="panel-control">
+        <h2>🔬 Ensayo Charpy</h2>
+        <div class="selector">
+            <label>Material</label>
+            <select id="material"></select>
+        </div>
+        <div class="slider">
+            <label>Ángulo inicial: <span id="valor-angulo">90°</span></label>
+            <input type="range" id="angulo" min="30" max="90" value="90" step="1">
+        </div>
+        <button id="btn-iniciar" class="btn-primario">▶ Iniciar ensayo</button>
+        <button id="btn-reiniciar" class="btn-secundario">↺ Reiniciar</button>
+
+        <div class="temp-control">
+    <label>Temperatura: <span id="valor-temperatura">20°C</span></label>
+    <input type="range" id="temperatura" min="-100" max="200" value="20" step="1">
+</div>
+<div class="slider">
+    <label>Masa del martillo: <span id="valor-masa">20</span> kg</label>
+    <input type="range" id="masa-martillo" min="5" max="50" value="20" step="0.5">
+</div>
+<div class="slider">
+    <label>Longitud del brazo: <span id="valor-brazo">1.20</span> m</label>
+    <input type="range" id="longitud-brazo" min="0.5" max="2.5" value="1.2" step="0.01">
+</div>
+
+        <div id="resultados">
+            <h3>Resultados</h3>
+            <div class="fila">
+                <span>Energía inicial</span>
+                <span id="e-inicial" class="valor">0 J</span>
+            </div>
+            <div class="fila">
+                <span>Energía absorbida</span>
+                <span id="e-absorbida" class="valor">0 J</span>
+            </div>
+            <div class="fila">
+                <span>Resiliencia</span>
+                <span id="resiliencia" class="valor">0 J/cm²</span>
+            </div>
+            <div class="fila">
+                <span>Tipo fractura</span>
+                <span id="tipo-fractura" class="valor">-</span>
+            </div>
+        </div>
+
+        <div class="botones-extra">
+            <button id="btn-grafica">📈 Gráfica</button>
+            <button id="btn-pdf">📄 Informe PDF</button>
+            <button id="btn-educativo">📚 Modo educativo</button>
+        </div>
+    </div>
+
+    <!-- Panel educativo (oculto por defecto) -->
+    <div id="panel-educativo" class="oculto">
+        <div class="contenido-educativo">
+            <span id="cerrar-educativo" class="cerrar">✖</span>
+            <h3>¿Qué es el ensayo Charpy?</h3>
+            <p>Mide la energía absorbida por un material al romperse de un solo golpe con un péndulo normalizado.</p>
+            <p><strong>Fórmula:</strong> E = m · g · h</p>
+            <p>Donde <em>h = L(1 − cos θ)</em>. La resiliencia es <em>R = E / A</em> (área bajo entalla).</p>
+            <h4>🤖 Aplicación en robótica</h4>
+            <p>En robótica industrial, los materiales deben soportar impactos sin fractura frágil. Este ensayo ayuda a seleccionar aleaciones para brazos robóticos, carcasas y uniones soldadas, garantizando seguridad y durabilidad.</p>
+        </div>
+    </div>
+
+    <!-- Panel de gráfica -->
+    <div id="panel-grafica" class="oculto">
+        <canvas id="grafica-canvas" width="400" height="300"></canvas>
+        <button id="btn-cerrar-grafica" class="btn-secundario">Cerrar</button>
+    </div>
+
+    <!-- Calibración del impacto (oculto, para ajuste fino) -->
+    <div id="panel-calibracion" class="oculto">
+        <label>Instante del impacto (s): <span id="valor-impacto">4.585</span></label>
+        <input type="range" id="slider-impacto" min="0" max="9.17" value="4.585" step="0.001">
+        <button id="btn-aplicar-calibracion">Aplicar</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
