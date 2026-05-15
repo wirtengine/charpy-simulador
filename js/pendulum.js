@@ -1,9 +1,18 @@
 import * as THREE from 'three';
-import { getLongitudBrazo, calcularEnergiaInicial, calcularAbsorbida, factorTemperatura } from './physics.js';
+import {
+    getLongitudBrazo,
+    getMasa,
+    calcularEnergiaInicial,
+    energiaMaximaMaterial,
+    determinarTipoFractura,
+    calcularEnergiaAbsorbida,
+    factorTemperatura
+} from './physics.js';
 
 let mixer, action, materialObj, probetaObj, callbackFin;
 let activo = false;
 let temperatura = 20;
+let anguloInicialGuardado = 90;
 const DURACION = 9.17;
 let tiempoImpacto = 4.585;
 
@@ -28,6 +37,7 @@ export function animarPendulo(_mixer, _action, angInicial, mat, prob, temp, cb) 
     probetaObj = prob;
     callbackFin = cb;
     temperatura = temp;
+    anguloInicialGuardado = angInicial;
     action.paused = true;
     let tActual = anguloToTime(angInicial);
     action.time = tActual;
@@ -49,11 +59,7 @@ export function animarPendulo(_mixer, _action, angInicial, mat, prob, temp, cb) 
         mixer.update(dt);
 
         if (nuevoAng <= 0 && velAng < 0) {
-            impacto(angInicial);
-            return;
-        }
-        if (velAng > 0 && nuevoAng >= angInicial) {
-            terminar();
+            impacto(angInicialGuardado);
             return;
         }
         requestAnimationFrame(paso);
@@ -63,23 +69,16 @@ export function animarPendulo(_mixer, _action, angInicial, mat, prob, temp, cb) 
 
 function impacto(angInicial) {
     const eInicial = calcularEnergiaInicial(angInicial);
-    const absorbida = calcularAbsorbida(eInicial, materialObj, temperatura);
-    const factor = factorTemperatura(temperatura);
-    const umbralFragil = materialObj.resistenciaFragil * factor;
-    let tipo = 'Sin fractura';
+    const maxAbs = energiaMaximaMaterial(materialObj) * factorTemperatura(temperatura);
+    const absorbida = Math.min(eInicial, maxAbs);
+    const hayFractura = eInicial > maxAbs;
+    let tipo;
 
-    if (absorbida >= umbralFragil * 0.95) {
-        const umbralDuctil = materialObj.resistenciaDuctil * factor;
-        if (absorbida <= umbralFragil) {
-            tipo = 'Frágil';
-        } else if (absorbida >= umbralDuctil) {
-            tipo = 'Dúctil';
-        } else {
-            tipo = 'Mixta';
-        }
-
+    if (hayFractura) {
+        tipo = determinarTipoFractura(materialObj);
         probetaObj.fracturar(materialObj, tipo);
 
+        // Efectos visuales según tipo de fractura
         if (tipo === 'Frágil') {
             window.camaraShake = true;
             window.camaraShakeFrames = 15;
@@ -102,22 +101,64 @@ function impacto(angInicial) {
             setTimeout(() => window.timeScale = 1, 600);
             sonidoImpacto('mixto');
         }
+
+        // Continuar movimiento del péndulo con la energía restante
+        const eRestante = eInicial - absorbida;
+        const L = getLongitudBrazo();
+        const masa = getMasa();
+        const hRestante = eRestante / (masa * 9.81);
+        const cosBeta = 1 - hRestante / L;
+        const beta = Math.acos(Math.max(-1, Math.min(1, cosBeta)));
+        const anguloFinal = THREE.MathUtils.radToDeg(beta);
+        animarRebote(anguloFinal);
     } else {
+        tipo = 'Sin fractura';
         probetaObj.deformar();
         window.camaraShake = true;
         window.camaraShakeFrames = 10;
         window.camaraShakeIntensidad = 0.01;
-        tipo = 'Sin fractura';
         sonidoImpacto('deformacion');
+        terminar();
     }
 
     if (callbackFin) callbackFin(absorbida, tipo);
-    terminar();
+}
+
+function animarRebote(anguloObjetivo) {
+    // Empezamos desde el ángulo 0 (impacto) y dejamos que el péndulo suba
+    let tActual = 0; // tiempo de animación en el punto de impacto
+    let velAng = 0;
+    const dt = 1 / 60;
+
+    function pasoRebote() {
+        if (!activo) return;
+        const L = getLongitudBrazo();
+        const angRad = THREE.MathUtils.degToRad(timeToAngulo(tActual));
+        const acelRad = -(9.81 / L) * Math.sin(angRad);
+        const acelGrad = THREE.MathUtils.radToDeg(acelRad);
+        velAng += acelGrad * dt;
+        velAng *= 0.999;
+        const nuevoAng = timeToAngulo(tActual) + velAng * dt;
+
+        if (nuevoAng >= anguloObjetivo || velAng <= 0) {
+            // Alcanzó el ángulo final o se detuvo
+            tActual = anguloToTime(Math.min(anguloObjetivo, nuevoAng));
+            action.time = tActual;
+            mixer.update(dt);
+            terminar();
+            return;
+        }
+
+        tActual = anguloToTime(nuevoAng);
+        action.time = tActual;
+        mixer.update(dt);
+        requestAnimationFrame(pasoRebote);
+    }
+    requestAnimationFrame(pasoRebote);
 }
 
 function sonidoImpacto(tipo) {
     try {
-        // Crear contexto de audio (puede fallar si no hay interacción previa, pero ya hay clic)
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         if (ctx.state === 'suspended') ctx.resume();
 
@@ -167,7 +208,6 @@ function sonidoImpacto(tipo) {
                 break;
         }
     } catch (e) {
-        // El navegador podría bloquear el audio si no hay interacción, pero ya se hizo clic.
         console.warn('Error al reproducir sonido:', e);
     }
 }
