@@ -13,15 +13,13 @@ export function getLongitudBrazo() { return LONGITUD_BRAZO; }
 export function calcularEnergiaInicial(anguloGrados) {
     const rad = THREE.MathUtils.degToRad(anguloGrados);
     const altura = LONGITUD_BRAZO * (1 - Math.cos(rad));
-    return MASA_MARTILLO * GRAVEDAD * altura; // julios
+    return MASA_MARTILLO * GRAVEDAD * altura;
 }
 
-// Energía máxima que puede absorber el material antes de fracturarse
 export function energiaMaximaMaterial(material) {
-    return material.resiliencia * AREA_PROBETA; // J
+    return material.resiliencia * AREA_PROBETA;
 }
 
-// Determina el tipo de fractura según la resiliencia del material
 export function determinarTipoFractura(material) {
     const r = material.resiliencia;
     if (r < 30) return 'Frágil';
@@ -29,7 +27,6 @@ export function determinarTipoFractura(material) {
     return 'Dúctil';
 }
 
-// Factor de corrección por temperatura (afecta la resiliencia)
 export function factorTemperatura(tempCelsius) {
     if (tempCelsius <= 20) {
         return Math.max(0.2, 1.0 - 0.008 * (20 - tempCelsius));
@@ -38,14 +35,12 @@ export function factorTemperatura(tempCelsius) {
     }
 }
 
-// Energía absorbida real en el impacto (limitada por la capacidad del material)
 export function calcularEnergiaAbsorbida(energiaCinetica, material, temperatura) {
     const factor = factorTemperatura(temperatura);
     const maxAbs = material.resiliencia * AREA_PROBETA * factor;
     return Math.min(energiaCinetica, maxAbs);
 }
 
-// Resiliencia calculada a partir de la energía absorbida
 export function calcularResiliencia(energiaAbsorbida) {
-    return energiaAbsorbida / AREA_PROBETA; // J/cm²
+    return energiaAbsorbida / AREA_PROBETA;
 }

@@ -56,7 +56,7 @@ export function animarPendulo(_mixer, _action, angInicial, mat, prob, temp, cb) 
         mixer.update(dt);
 
         if (nuevoAng <= 0 && velAng < 0) {
-            impacto(angInicial);   // ← pasamos angInicial directamente
+            impacto(angInicial);
             return;
         }
         requestAnimationFrame(paso);
@@ -98,7 +98,6 @@ function impacto(angInicial) {
             sonidoImpacto('mixto');
         }
 
-        // Calcular rebote con masa real
         const eRestante = eInicial - absorbida;
         const L = getLongitudBrazo();
         const masa = getMasa();
