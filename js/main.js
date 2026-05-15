@@ -3,7 +3,12 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { crearEntorno } from './environment.js';
 import { categorias, obtenerTodosMateriales } from './materials.js';
-import { setMasa, setLongitudBrazo, calcularEnergiaInicial, calcularAbsorbida, calcularResiliencia } from './physics.js';
+import {
+    setMasa,
+    setLongitudBrazo,
+    calcularEnergiaInicial,
+    calcularResiliencia
+} from './physics.js';
 import { crearProbeta, actualizarMaterialProbeta } from './specimen.js';
 import { animarPendulo, resetPendulo, setTiempoImpacto } from './pendulum.js';
 import { initChart, updateChart } from './charts.js';
@@ -118,7 +123,6 @@ async function init() {
 }
 
 function configurarEventosUI() {
-    // --- Sincronización slider ↔ input numérico ---
     function sincronizar(idSlider, idNum, esDecimal = false) {
         const slider = document.getElementById(idSlider);
         const num = document.getElementById(idNum);
@@ -135,7 +139,6 @@ function configurarEventosUI() {
         };
         slider.addEventListener('input', actualizarNum);
         num.addEventListener('input', actualizarSlider);
-        // Disparar una vez para sincronizar valores iniciales
         actualizarNum();
     }
 
@@ -144,7 +147,6 @@ function configurarEventosUI() {
     sincronizar('masa-martillo', 'masa-martillo-num', true);
     sincronizar('longitud-brazo', 'longitud-brazo-num', true);
 
-    // Listeners de cambio para actualizar variables
     document.getElementById('angulo').addEventListener('input', e => {
         anguloInicial = +e.target.value;
     });
@@ -169,7 +171,6 @@ function configurarEventosUI() {
     document.getElementById('btn-educativo').onclick = () => document.getElementById('panel-educativo').classList.remove('oculto');
     document.getElementById('cerrar-educativo').onclick = () => document.getElementById('panel-educativo').classList.add('oculto');
 
-    // Calibración
     let tiempoImpacto = 4.585;
     setTiempoImpacto(tiempoImpacto);
     document.getElementById('slider-impacto').addEventListener('input', e => {
