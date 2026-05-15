@@ -16,6 +16,12 @@
 <body>
     <div id="contenedor-3d"></div>
 
+    <!-- Banner de autores -->
+    <div id="banner-autores">
+        <span class="icono-autores">🧑‍🔬</span>
+        Br. Wilberth Alejandro Pérez Loredo · Br. Engel Mohamed Urbina Rivas · Br. Luis Miguel Garcia Mondragon · Br. Maria Fernanda Bucardo Cuadra
+    </div>
+
     <!-- Panel de control principal -->
     <div id="panel-control">
         <h2>🔬 Ensayo Charpy</h2>
@@ -23,25 +29,45 @@
             <label>Material</label>
             <select id="material"></select>
         </div>
+
+        <!-- Ángulo con input numérico -->
         <div class="slider">
-            <label>Ángulo inicial: <span id="valor-angulo">90°</span></label>
-            <input type="range" id="angulo" min="30" max="90" value="90" step="1">
+            <label>Ángulo inicial:</label>
+            <div class="input-group">
+                <input type="range" id="angulo" min="1" max="90" value="90" step="1">
+                <input type="number" id="angulo-num" value="90" min="1" max="90" step="1">°
+            </div>
         </div>
+
+        <!-- Temperatura con input numérico -->
+        <div class="slider">
+            <label>Temperatura:</label>
+            <div class="input-group">
+                <input type="range" id="temperatura" min="-200" max="500" value="20" step="1">
+                <input type="number" id="temperatura-num" value="20" min="-200" max="500" step="1">°C
+            </div>
+        </div>
+
+        <!-- Masa del martillo con input numérico -->
+        <div class="slider">
+            <label>Masa del martillo:</label>
+            <div class="input-group">
+                <input type="range" id="masa-martillo" min="0.1" max="100" value="20" step="0.1">
+                <input type="number" id="masa-martillo-num" value="20" min="0.1" max="100" step="0.1"> kg
+            </div>
+        </div>
+
+        <!-- Longitud del brazo con input numérico -->
+        <div class="slider">
+            <label>Longitud del brazo:</label>
+            <div class="input-group">
+                <input type="range" id="longitud-brazo" min="0.1" max="5" value="1.2" step="0.01">
+                <input type="number" id="longitud-brazo-num" value="1.20" min="0.1" max="5" step="0.01"> m
+            </div>
+        </div>
+
         <button id="btn-iniciar" class="btn-primario">▶ Iniciar ensayo</button>
         <button id="btn-reiniciar" class="btn-secundario">↺ Reiniciar</button>
-
-        <div class="temp-control">
-    <label>Temperatura: <span id="valor-temperatura">20°C</span></label>
-    <input type="range" id="temperatura" min="-100" max="200" value="20" step="1">
-</div>
-<div class="slider">
-    <label>Masa del martillo: <span id="valor-masa">20</span> kg</label>
-    <input type="range" id="masa-martillo" min="5" max="50" value="20" step="0.5">
-</div>
-<div class="slider">
-    <label>Longitud del brazo: <span id="valor-brazo">1.20</span> m</label>
-    <input type="range" id="longitud-brazo" min="0.5" max="2.5" value="1.2" step="0.01">
-</div>
 
         <div id="resultados">
             <h3>Resultados</h3>

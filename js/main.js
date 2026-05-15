@@ -24,52 +24,42 @@ async function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.toneMapping = THREE.LinearToneMapping; // Cambio a lineal para colores más naturales de día
-    renderer.toneMappingExposure = 1.0; 
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     document.getElementById('contenedor-3d').appendChild(renderer.domElement);
 
     escena = new THREE.Scene();
-    // COLOR DE FONDO: Gris claro técnico que combina con el azul del suelo
-    escena.background = new THREE.Color(0xdae1e7); 
+    escena.background = new THREE.Color(0xdae1e7);
     escena.environment = crearEntorno(renderer);
 
     camara = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
     camara.position.set(3.5, 2.2, 5.5);
-    
+
     controls = new OrbitControls(camara, renderer.domElement);
     controls.target.set(0, -0.3, 0);
     controls.enableDamping = true;
-    
-    // RESTRICCIÓN DE CÁMARA: No traspasa el suelo
-    controls.maxPolarAngle = Math.PI / 2.1; 
+    controls.maxPolarAngle = Math.PI / 2.1;
     controls.minDistance = 2;
     controls.maxDistance = 12;
 
-    // --- ILUMINACIÓN DE DÍA ---
-    // Luz ambiental blanca y clara
-    escena.add(new THREE.AmbientLight(0xffffff, 1.2)); 
-
-    // Luz principal (Simula el sol o luz de techo potente)
+    escena.add(new THREE.AmbientLight(0xffffff, 1.2));
     const luzPrincipal = new THREE.DirectionalLight(0xffffff, 2.5);
     luzPrincipal.position.set(5, 10, 7);
     luzPrincipal.castShadow = true;
     luzPrincipal.shadow.mapSize.set(2048, 2048);
     luzPrincipal.shadow.bias = -0.0001;
     escena.add(luzPrincipal);
-
-    // Luz de relleno para eliminar sombras negras profundas
     const luzRelleno = new THREE.DirectionalLight(0xffffff, 0.8);
     luzRelleno.position.set(-5, 5, -5);
     escena.add(luzRelleno);
 
-    // --- SUELO (Tu diseño original) ---
     const canvas = document.createElement('canvas');
     canvas.width = 512; canvas.height = 512;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#2c3e50'; // Tu color original
+    ctx.fillStyle = '#2c3e50';
     ctx.fillRect(0, 0, 512, 512);
-    ctx.strokeStyle = '#34495e'; // Rejilla un poco más visible
+    ctx.strokeStyle = '#34495e';
     ctx.lineWidth = 2;
     for (let i = 0; i <= 512; i += 64) {
         ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
@@ -78,9 +68,8 @@ async function init() {
     const texturaSuelo = new THREE.CanvasTexture(canvas);
     texturaSuelo.wrapS = texturaSuelo.wrapT = THREE.RepeatWrapping;
     texturaSuelo.repeat.set(6, 6);
-    
     const suelo = new THREE.Mesh(
-        new THREE.PlaneGeometry(30, 30), 
+        new THREE.PlaneGeometry(30, 30),
         new THREE.MeshStandardMaterial({ map: texturaSuelo, roughness: 0.7 })
     );
     suelo.rotation.x = -Math.PI / 2;
@@ -88,7 +77,6 @@ async function init() {
     suelo.receiveShadow = true;
     escena.add(suelo);
 
-    // --- CARGA DEL MODELO ---
     try {
         const gltf = await new GLTFLoader().loadAsync('../impact_testing_machine_charpy/scene.gltf');
         modelo = gltf.scene;
@@ -101,7 +89,6 @@ async function init() {
             if (child.isMesh) {
                 child.castShadow = child.receiveShadow = true;
                 if (child.material) {
-                    // Ajustamos el material para que brille de forma natural con la luz de día
                     child.material.roughness = 0.4;
                     child.material.metalness = 0.5;
                 }
@@ -131,28 +118,51 @@ async function init() {
 }
 
 function configurarEventosUI() {
+    // --- Sincronización slider ↔ input numérico ---
+    function sincronizar(idSlider, idNum, esDecimal = false) {
+        const slider = document.getElementById(idSlider);
+        const num = document.getElementById(idNum);
+        const actualizarNum = () => {
+            num.value = esDecimal ? parseFloat(slider.value).toFixed(2) : parseInt(slider.value);
+        };
+        const actualizarSlider = () => {
+            let val = esDecimal ? parseFloat(num.value) : parseInt(num.value);
+            if (isNaN(val)) return;
+            val = Math.max(parseFloat(slider.min), Math.min(parseFloat(slider.max), val));
+            slider.value = val;
+            num.value = esDecimal ? val.toFixed(2) : val;
+            slider.dispatchEvent(new Event('input'));
+        };
+        slider.addEventListener('input', actualizarNum);
+        num.addEventListener('input', actualizarSlider);
+        // Disparar una vez para sincronizar valores iniciales
+        actualizarNum();
+    }
+
+    sincronizar('angulo', 'angulo-num', false);
+    sincronizar('temperatura', 'temperatura-num', false);
+    sincronizar('masa-martillo', 'masa-martillo-num', true);
+    sincronizar('longitud-brazo', 'longitud-brazo-num', true);
+
+    // Listeners de cambio para actualizar variables
     document.getElementById('angulo').addEventListener('input', e => {
         anguloInicial = +e.target.value;
-        document.getElementById('valor-angulo').textContent = anguloInicial + '°';
     });
     document.getElementById('temperatura').addEventListener('input', e => {
         temperatura = +e.target.value;
-        document.getElementById('valor-temperatura').textContent = temperatura + '°C';
     });
     document.getElementById('masa-martillo').addEventListener('input', e => {
         masaMartillo = parseFloat(e.target.value);
-        document.getElementById('valor-masa').textContent = masaMartillo;
         setMasa(masaMartillo);
     });
     document.getElementById('longitud-brazo').addEventListener('input', e => {
         longitudBrazo = parseFloat(e.target.value);
-        document.getElementById('valor-brazo').textContent = longitudBrazo.toFixed(2);
         setLongitudBrazo(longitudBrazo);
     });
-    
+
     document.getElementById('btn-iniciar').onclick = iniciarEnsayo;
     document.getElementById('btn-reiniciar').onclick = reiniciar;
-    
+
     document.getElementById('btn-grafica').onclick = () => document.getElementById('panel-grafica').classList.remove('oculto');
     document.getElementById('btn-cerrar-grafica').onclick = () => document.getElementById('panel-grafica').classList.add('oculto');
     document.getElementById('btn-pdf').onclick = () => generarPDF(ultimoEnsayo);
@@ -224,13 +234,13 @@ async function iniciarEnsayo() {
     document.getElementById('btn-iniciar').disabled = true;
     const eIni = calcularEnergiaInicial(anguloInicial);
     document.getElementById('e-inicial').textContent = eIni.toFixed(2) + ' J';
-    
+
     animarPendulo(mixer, action, anguloInicial, matSel, probeta, temperatura, (absorbida, tipo) => {
         const res = calcularResiliencia(absorbida);
         document.getElementById('e-absorbida').textContent = absorbida.toFixed(2) + ' J';
         document.getElementById('resiliencia').textContent = res.toFixed(2) + ' J/cm²';
         document.getElementById('tipo-fractura').textContent = tipo;
-        
+
         ultimoEnsayo = {
             material: matSel.nombre,
             angulo: anguloInicial,
@@ -242,7 +252,7 @@ async function iniciarEnsayo() {
             resiliencia: res.toFixed(2),
             tipoFractura: tipo
         };
-        
+
         updateChart(`${matSel.nombre}`, absorbida);
         document.getElementById('btn-iniciar').disabled = false;
         ensayando = false;

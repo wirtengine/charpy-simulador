@@ -17,7 +17,8 @@ export const categorias = [
             { id: 'policarbonato', nombre: 'Policarbonato', resistenciaFragil: 25, resistenciaDuctil: 70, ductilidad: 0.9, color: 0x2ecc71, rugosidad: 0.5, metalness: 0.1, tipoBase: 'Dúctil' },
             { id: 'nylon', nombre: 'Nylon 6', resistenciaFragil: 15, resistenciaDuctil: 55, ductilidad: 0.8, color: 0x3498db, rugosidad: 0.6, metalness: 0.1, tipoBase: 'Dúctil' },
             { id: 'epoxi', nombre: 'Resina Epoxi', resistenciaFragil: 5, resistenciaDuctil: 15, ductilidad: 0.15, color: 0xe74c3c, rugosidad: 0.5, metalness: 0.1, tipoBase: 'Frágil' },
-            { id: 'pet', nombre: 'PET', resistenciaFragil: 10, resistenciaDuctil: 35, ductilidad: 0.7, color: 0x1abc9c, rugosidad: 0.55, metalness: 0.05, tipoBase: 'Dúctil' }
+            { id: 'pet', nombre: 'PET', resistenciaFragil: 10, resistenciaDuctil: 35, ductilidad: 0.7, color: 0x1abc9c, rugosidad: 0.55, metalness: 0.05, tipoBase: 'Dúctil' },
+            { id: 'petg', nombre: 'PETG', resistenciaFragil: 12, resistenciaDuctil: 40, ductilidad: 0.75, color: 0x16a085, rugosidad: 0.5, metalness: 0.08, tipoBase: 'Dúctil' }
         ]
     },
     {
