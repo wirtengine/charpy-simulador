@@ -5,14 +5,12 @@ import {
     calcularEnergiaInicial,
     energiaMaximaMaterial,
     determinarTipoFractura,
-    calcularEnergiaAbsorbida,
     factorTemperatura
 } from './physics.js';
 
 let mixer, action, materialObj, probetaObj, callbackFin;
 let activo = false;
 let temperatura = 20;
-let anguloInicialGuardado = 90;
 const DURACION = 9.17;
 let tiempoImpacto = 4.585;
 
@@ -37,7 +35,6 @@ export function animarPendulo(_mixer, _action, angInicial, mat, prob, temp, cb) 
     probetaObj = prob;
     callbackFin = cb;
     temperatura = temp;
-    anguloInicialGuardado = angInicial;
     action.paused = true;
     let tActual = anguloToTime(angInicial);
     action.time = tActual;
@@ -59,7 +56,7 @@ export function animarPendulo(_mixer, _action, angInicial, mat, prob, temp, cb) 
         mixer.update(dt);
 
         if (nuevoAng <= 0 && velAng < 0) {
-            impacto(angInicialGuardado);
+            impacto(angInicial);   // ← pasamos angInicial directamente
             return;
         }
         requestAnimationFrame(paso);
@@ -78,7 +75,6 @@ function impacto(angInicial) {
         tipo = determinarTipoFractura(materialObj);
         probetaObj.fracturar(materialObj, tipo);
 
-        // Efectos visuales según tipo de fractura
         if (tipo === 'Frágil') {
             window.camaraShake = true;
             window.camaraShakeFrames = 15;
@@ -102,7 +98,7 @@ function impacto(angInicial) {
             sonidoImpacto('mixto');
         }
 
-        // Continuar movimiento del péndulo con la energía restante
+        // Calcular rebote con masa real
         const eRestante = eInicial - absorbida;
         const L = getLongitudBrazo();
         const masa = getMasa();
@@ -125,8 +121,7 @@ function impacto(angInicial) {
 }
 
 function animarRebote(anguloObjetivo) {
-    // Empezamos desde el ángulo 0 (impacto) y dejamos que el péndulo suba
-    let tActual = 0; // tiempo de animación en el punto de impacto
+    let tActual = 0;
     let velAng = 0;
     const dt = 1 / 60;
 
@@ -141,7 +136,6 @@ function animarRebote(anguloObjetivo) {
         const nuevoAng = timeToAngulo(tActual) + velAng * dt;
 
         if (nuevoAng >= anguloObjetivo || velAng <= 0) {
-            // Alcanzó el ángulo final o se detuvo
             tActual = anguloToTime(Math.min(anguloObjetivo, nuevoAng));
             action.time = tActual;
             mixer.update(dt);
