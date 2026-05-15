@@ -6,6 +6,7 @@ let LONGITUD_BRAZO = 1.2;
 const AREA_PROBETA = 0.8; // cm²
 
 export function setMasa(valor) { MASA_MARTILLO = valor; }
+export function getMasa() { return MASA_MARTILLO; }
 export function setLongitudBrazo(valor) { LONGITUD_BRAZO = valor; }
 export function getLongitudBrazo() { return LONGITUD_BRAZO; }
 
@@ -42,4 +43,9 @@ export function calcularEnergiaAbsorbida(energiaCinetica, material, temperatura)
     const factor = factorTemperatura(temperatura);
     const maxAbs = material.resiliencia * AREA_PROBETA * factor;
     return Math.min(energiaCinetica, maxAbs);
+}
+
+// Resiliencia calculada a partir de la energía absorbida
+export function calcularResiliencia(energiaAbsorbida) {
+    return energiaAbsorbida / AREA_PROBETA; // J/cm²
 }
