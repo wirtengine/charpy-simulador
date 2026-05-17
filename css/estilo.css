@@ -51,7 +51,14 @@ body {
     font-size: 1.5rem;
     filter: drop-shadow(0 0 6px var(--acento));
 }
-.autores { display: flex; gap: 8px; flex-wrap: wrap; }
+.autores {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    /* En móvil permitimos scroll horizontal si no caben */
+    overflow-x: auto;
+    white-space: nowrap;
+}
 .badge {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
@@ -112,7 +119,6 @@ body {
     color: var(--texto);
     max-width: 90vw;
 }
-/* Escritorio: posiciones fijas */
 #panel-educativo {
     top: 75px;
     left: 20px;
@@ -128,7 +134,6 @@ body {
     left: 20px;
     width: 280px;
 }
-/* Botón de cerrar */
 .cerrar-modal {
     position: absolute;
     top: 10px;
@@ -139,7 +144,7 @@ body {
     z-index: 5;
 }
 
-/* --- ESTILOS INTERNOS COMUNES (inputs, botones, etc.) --- */
+/* --- ESTILOS INTERNOS COMUNES --- */
 h2, h3 { margin-bottom: 16px; color: #fff; font-weight: 600; }
 .selector, .slider { margin-bottom: 14px; }
 label {
@@ -260,7 +265,7 @@ input[type="number"] {
 
 .oculto { display: none !important; }
 
-/* --- MÓVIL (hasta 768px): Split vertical + paneles flotantes pequeños --- */
+/* --- MÓVIL (hasta 768px) --- */
 @media (max-width: 768px) {
     body {
         display: flex;
@@ -270,6 +275,18 @@ input[type="number"] {
 
     #barra-superior {
         height: 48px;
+    }
+
+    /* Ajuste de autores: se mantienen visibles, con scroll si es necesario */
+    .autores {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 60%;
+        gap: 4px;
+    }
+    .badge {
+        font-size: 0.6rem;
+        padding: 2px 8px;
     }
 
     #contenedor-3d {
@@ -285,24 +302,16 @@ input[type="number"] {
         top: auto;
         right: auto;
         width: 100%;
-        height: 35vh;
+        height: 38vh;               /* Un poco más alto para que los botones quepan */
         max-height: none;
         border-radius: var(--radio) var(--radio) 0 0;
         box-shadow: var(--sombra);
         margin-top: 0;
         z-index: 50;
-        padding: 15px 15px 25px;
+        padding: 15px 15px 20px;
     }
 
-    .autores {
-        display: none;
-    }
-
-    input[type="number"] {
-        width: 60px;
-    }
-
-    /* Paneles flotantes: en móvil, pequeños, centrados abajo o a la derecha */
+    /* Paneles flotantes en móvil */
     #panel-educativo,
     #panel-grafica,
     #panel-calibracion {
@@ -324,20 +333,23 @@ input[type="number"] {
     }
 
     #panel-grafica {
-        bottom: 45vh;  /* justo por encima del panel de control */
+        bottom: 40vh;  /* justo por encima del panel de control */
         right: 10px;
         width: 280px;
     }
 
     #panel-calibracion {
-        bottom: 45vh;
+        bottom: 40vh;
         right: 10px;
         width: 260px;
     }
 
-    /* Ajuste del canvas de gráfica para que quepa */
     #grafica-canvas {
         width: 100% !important;
         height: auto !important;
+    }
+
+    input[type="number"] {
+        width: 60px;
     }
 }

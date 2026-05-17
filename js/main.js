@@ -236,7 +236,6 @@ async function iniciarEnsayo() {
     ensayando = true;
     document.getElementById('btn-iniciar').disabled = true;
 
-    // Evento para plegar el panel (mantenemos compatibilidad)
     window.dispatchEvent(new CustomEvent('ensayoIniciado'));
 
     const eIni = calcularEnergiaInicial(anguloInicial);
