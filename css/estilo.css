@@ -1,6 +1,6 @@
 :root {
     --fondo: #090c14;
-    --panel-bg: rgba(18, 22, 33, 0.85);
+    --panel-bg: rgba(18, 22, 33, 0.95);
     --texto: #eef2ff;
     --texto-secundario: #8e9bb5;
     --acento: #ff8c42;
@@ -9,7 +9,7 @@
     --borde: rgba(255,255,255,0.1);
     --sombra: 0 20px 40px rgba(0,0,0,0.6);
     --radio: 18px;
-    --transicion: 0.2s ease;
+    --transicion: 0.3s ease;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -36,7 +36,6 @@ body {
     padding: 0 20px;
     z-index: 100;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    flex-wrap: wrap;
 }
 .logo-simulador {
     display: flex;
@@ -51,12 +50,7 @@ body {
     font-size: 1.5rem;
     filter: drop-shadow(0 0 6px var(--acento));
 }
-.autores {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
+.autores { display: flex; gap: 8px; flex-wrap: wrap; }
 .badge {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
@@ -76,84 +70,69 @@ body {
     transform: translateY(-1px);
 }
 
-/* --- CONTENEDOR 3D --- */
+/* --- CONTENEDOR 3D (SIEMPRE VISIBLE) --- */
 #contenedor-3d {
     position: absolute;
     inset: 0;
     z-index: 1;
 }
 
-/* --- BOTÓN TOGGLE (solo visible en móvil) --- */
-.btn-toggle {
+/* --- BOTÓN FLOTANTE (solo móvil) --- */
+.fab {
     display: none;
     position: absolute;
-    top: -30px;
-    right: 15px;
-    width: 36px;
-    height: 36px;
+    bottom: 25px;
+    right: 25px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    background: var(--panel-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--borde);
-    color: var(--texto);
-    font-size: 1.2rem;
+    background: var(--acento);
+    color: #fff;
+    font-size: 1.5rem;
+    border: none;
+    box-shadow: 0 8px 20px rgba(255,140,66,0.5);
+    z-index: 200;
     cursor: pointer;
-    z-index: 101;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.4);
-    align-items: center;
-    justify-content: center;
-    transition: transform var(--transicion);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
-.btn-toggle:hover {
-    background: rgba(255,140,66,0.2);
-    border-color: var(--acento);
+.fab:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 28px rgba(255,140,66,0.7);
 }
 
-/* --- PANEL DE CONTROL (ESCRITORIO) --- */
-#panel-control {
-    position: absolute;
-    top: 75px;
-    right: 20px;
-    width: 310px;
+/* --- MODALES MÓVILES (y paneles en escritorio) --- */
+.modal-movil {
     background: var(--panel-bg);
     backdrop-filter: blur(28px);
     border-radius: var(--radio);
-    padding: 22px 20px;
     box-shadow: var(--sombra), 0 0 0 1px var(--borde);
-    z-index: 10;
+    z-index: 150;
+    position: absolute;
+    transition: opacity var(--transicion), transform var(--transicion);
+}
+/* En escritorio, los paneles se muestran normalmente */
+#panel-control {
+    top: 75px; right: 20px;
+    width: 310px;
     max-height: calc(100vh - 100px);
+    padding: 22px 20px;
     overflow-y: auto;
-    transition: box-shadow 0.3s, transform 0.3s, max-height 0.3s;
 }
-#panel-control:hover {
-    box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.15);
+#panel-educativo {
+    top: 75px; left: 20px;
+    width: 320px;
+    padding: 20px;
 }
-#panel-control h2 {
-    margin-bottom: 16px;
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: #fff;
-    letter-spacing: -0.3px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+#panel-grafica {
+    bottom: 20px; left: 20px;
+    padding: 20px;
 }
+.cerrar-modal { display: none; } /* ocultos en escritorio */
 
-.selector, .slider {
-    margin-bottom: 14px;
-}
-
-label {
-    display: block;
-    font-size: 0.7rem;
-    margin-bottom: 5px;
-    color: var(--texto-secundario);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 600;
-}
-
-/* SELECT PERSONALIZADO OSCURO */
+/* Estilos internos (inputs, botones, etc.) */
+h2, h3 { margin-bottom: 16px; color: #fff; }
+.selector, .slider { margin-bottom: 14px; }
+label { font-size: 0.7rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
 select {
     width: 100%;
     background: rgba(255,255,255,0.06);
@@ -163,275 +142,95 @@ select {
     color: white;
     font-size: 0.9rem;
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ff8c42' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23ff8c42' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 12px;
     outline: none;
-    transition: border-color var(--transicion), background var(--transicion);
     cursor: pointer;
 }
-select:focus {
-    border-color: var(--acento);
-    background-color: rgba(255,255,255,0.1);
-}
-select option {
-    background: #1a1e2b !important;
-    color: #fff !important;
-    padding: 8px;
-}
-select optgroup {
-    background: #151820 !important;
-    color: var(--acento) !important;
-    font-weight: bold;
-    font-style: normal;
-}
-select optgroup option {
-    background: #1a1e2b !important;
-    color: #fff !important;
-}
+select:focus { border-color: var(--acento); }
+select option, select optgroup { background: #1a1e2b !important; color: #fff !important; }
+select optgroup { color: var(--acento) !important; font-weight: bold; }
 
-/* SLIDERS E INPUTS */
-input[type="range"] {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--borde);
-    border-radius: 10px;
-    padding: 9px 12px;
-    color: white;
-    outline: none;
-    font-size: 0.9rem;
-    transition: border-color var(--transicion), background var(--transicion);
-    -webkit-appearance: none;
-    height: 6px;
-    background: rgba(255,255,255,0.1);
-}
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    background: var(--acento);
-    border-radius: 50%;
-    box-shadow: 0 0 6px var(--acento);
-    cursor: pointer;
-    border: none;
-}
-input[type="range"]:focus {
-    border-color: var(--acento);
-}
-
+input[type="range"] { width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 5px; -webkit-appearance: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--acento); border-radius: 50%; cursor: pointer; }
 input[type="number"] {
-    width: 70px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--borde);
-    border-radius: 8px;
-    color: white;
-    padding: 6px 8px;
-    font-size: 0.8rem;
-    text-align: center;
-    transition: border-color var(--transicion);
+    width: 70px; background: rgba(255,255,255,0.06); border: 1px solid var(--borde); border-radius: 8px;
+    color: white; padding: 6px 8px; font-size: 0.8rem; text-align: center;
 }
-input[type="number"]:focus {
-    border-color: var(--acento);
-    background: rgba(255,255,255,0.1);
-}
+.input-group { display: flex; align-items: center; gap: 8px; }
+.input-group input[type="range"] { flex: 1; }
 
-.input-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.input-group input[type="range"] {
-    flex: 1;
-}
-
-/* BOTONES */
 .btn-primario, .btn-secundario {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all var(--transicion);
-    margin-top: 8px;
-    letter-spacing: 0.3px;
+    width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: 600; font-size: 0.95rem;
+    cursor: pointer; margin-top: 8px; letter-spacing: 0.3px;
 }
-.btn-primario {
-    background: linear-gradient(135deg, var(--acento), #e67e22);
-    color: #fff;
-    box-shadow: 0 8px 18px rgba(255,140,66,0.35);
-}
-.btn-primario:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(255,140,66,0.5);
-    background: linear-gradient(135deg, var(--acento-2), var(--acento));
-}
-.btn-secundario {
-    background: rgba(255,255,255,0.08);
-    color: var(--texto);
-    backdrop-filter: blur(4px);
-}
-.btn-secundario:hover {
-    background: rgba(255,255,255,0.18);
-}
+.btn-primario { background: linear-gradient(135deg, var(--acento), #e67e22); color: #fff; box-shadow: 0 8px 18px rgba(255,140,66,0.35); }
+.btn-primario:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(255,140,66,0.5); }
+.btn-secundario { background: rgba(255,255,255,0.08); color: var(--texto); backdrop-filter: blur(4px); }
+.btn-secundario:hover { background: rgba(255,255,255,0.18); }
 
-/* RESULTADOS */
-#resultados {
-    margin-top: 22px;
-    padding: 14px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 14px;
-    border: 1px solid var(--borde);
-}
-#resultados h3 {
-    font-size: 0.75rem;
-    color: var(--texto-secundario);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
-}
-.fila {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-}
-.valor {
-    font-weight: 700;
-    color: var(--acento-2);
-}
-
-.botones-extra {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 12px;
-}
+#resultados { margin-top: 22px; padding: 14px; background: rgba(255,255,255,0.04); border-radius: 14px; border: 1px solid var(--borde); }
+#resultados h3 { font-size: 0.75rem; color: var(--texto-secundario); margin-bottom: 12px; }
+.fila { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
+.valor { font-weight: 700; color: var(--acento-2); }
+.botones-extra { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .botones-extra button {
-    flex: 1;
-    padding: 7px 4px;
-    font-size: 0.7rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--borde);
-    color: var(--texto);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background var(--transicion);
+    flex: 1; padding: 7px 4px; font-size: 0.7rem; background: rgba(255,255,255,0.05); border: 1px solid var(--borde);
+    color: var(--texto); border-radius: 8px; cursor: pointer;
 }
-.botones-extra button:hover {
-    background: rgba(255,140,66,0.15);
-}
-
 .oculto { display: none !important; }
 
-/* PANELES FLOTANTES */
-#panel-educativo, #panel-grafica, #panel-calibracion {
-    position: absolute;
-    background: var(--panel-bg);
-    backdrop-filter: blur(28px);
-    border-radius: var(--radio);
-    padding: 20px;
-    z-index: 20;
-    box-shadow: var(--sombra), 0 0 0 1px var(--borde);
-    color: var(--texto);
-}
-#panel-educativo {
-    left: 20px;
-    top: 75px;
-    width: 320px;
-}
-#panel-educativo .cerrar {
-    float: right;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #ff7b7b;
-}
-#panel-grafica {
-    left: 20px;
-    bottom: 20px;
-}
-#panel-calibracion {
-    left: 20px;
-    bottom: 20px;
-    width: 280px;
-}
-
-/* --- RESPONSIVE MÓVIL --- */
+/* --- COMPORTAMIENTO RESPONSIVE --- */
 @media (max-width: 768px) {
-    #barra-superior {
-        height: auto;
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 8px 12px;
-        gap: 6px;
-    }
-    .autores {
-        justify-content: flex-start;
-        gap: 4px;
-        overflow-x: auto;
-        width: 100%;
-        -webkit-overflow-scrolling: touch;
-    }
-    .badge {
-        font-size: 0.6rem;
-        padding: 2px 6px;
-    }
+    .autores { display: none; } /* Solo logo en móvil */
+    .fab { display: block; }
 
-    /* El panel se convierte en cajón inferior */
-    #panel-control {
-        position: absolute;
-        top: auto;
-        bottom: 0;
-        right: 0;
-        left: 0;
+    /* Convertir paneles en modales ocultos por defecto */
+    #panel-control, #panel-educativo, #panel-grafica {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
         width: 100%;
-        max-height: 40vh;
-        border-radius: var(--radio) var(--radio) 0 0;
-        padding: 12px 15px;
-        transform: translateY(0);
-        transition: max-height 0.3s ease, padding 0.3s;
+        max-height: 100vh;
+        border-radius: 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.95);
+        z-index: 150;
+        padding: 30px 20px 40px;
         overflow-y: auto;
-        z-index: 50;
+    }
+    /* Cuando tengan la clase .visible se muestran */
+    #panel-control.visible, #panel-educativo.visible, #panel-grafica.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
     }
 
-    /* Estado expandido (casi toda la pantalla) */
-    #panel-control.expandido {
-        max-height: 82vh;
-        padding-bottom: 30px;
+    /* Botón cerrar modal visible */
+    .cerrar-modal {
+        display: block;
+        position: absolute;
+        top: 15px; right: 15px;
+        background: none;
+        border: none;
+        color: var(--texto);
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 10;
     }
 
-    /* Botón toggle visible */
-    .btn-toggle {
-        display: flex;
-    }
+    /* El botón de cerrar de cada panel */
+    #panel-control .cerrar-modal { display: block; }
+    #panel-educativo .cerrar-modal { display: block; }
+    #panel-grafica .cerrar-modal { display: block; }
 
-    /* Ajustar inputs para táctiles */
-    input[type="number"] {
-        width: 55px;
-        padding: 8px 4px;
-        font-size: 0.75rem;
-    }
-    .input-group {
-        gap: 5px;
-    }
+    /* Ocultar botón flotante cuando un modal está abierto */
+    .fab.oculto { display: none; }
 
-    #panel-educativo {
-        left: 10px;
-        top: 60px;
-        width: calc(100% - 20px);
-    }
-    #panel-grafica {
-        left: 10px;
-        bottom: 50px;
-        width: calc(100% - 20px);
-    }
-    #panel-calibracion {
-        left: 10px;
-        bottom: 50px;
-        width: calc(100% - 20px);
-    }
+    /* Ajustes de inputs para móvil */
+    input[type="number"] { width: 60px; }
+    .input-group { gap: 5px; }
+    #panel-calibracion { display: none; } /* Ocultar calibración en móvil */
 }

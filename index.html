@@ -17,7 +17,7 @@
 </head>
 <body>
 
-    <!-- Barra superior con identidad y autores -->
+    
     <div id="barra-superior">
         <div class="logo-simulador">
             <span class="icono">⚙️</span>
@@ -31,12 +31,15 @@
         </div>
     </div>
 
-    <!-- Contenedor 3D (siempre detrás) -->
+  
     <div id="contenedor-3d"></div>
 
-    <!-- Panel de control (cajón abajo en móvil) -->
-    <div id="panel-control">
-        <button id="btn-toggle-panel" class="btn-toggle" aria-label="Expandir panel">▲</button>
+    
+    <button id="btn-abrir-controles" class="fab"></button>
+
+    
+    <div id="panel-control" class="modal-movil">
+        <button id="btn-cerrar-controles" class="cerrar-modal">✖</button>
         <h2>🔬 Ensayo Charpy</h2>
 
         <div class="selector">
@@ -106,47 +109,49 @@
         </div>
     </div>
 
-    <!-- Panel educativo -->
-    <div id="panel-educativo" class="oculto">
-        <div class="contenido-educativo">
-            <span id="cerrar-educativo" class="cerrar">✖</span>
-            <h3>¿Qué es el ensayo Charpy?</h3>
-            <p>Mide la energía absorbida por un material al romperse de un solo golpe con un péndulo normalizado.</p>
-            <p><strong>Fórmula:</strong> E = m · g · h</p>
-            <p>Donde <em>h = L(1 − cos θ)</em>. La resiliencia es <em>R = E / A</em> (área bajo entalla).</p>
-            <h4>🤖 Aplicación en robótica</h4>
-            <p>En robótica industrial, los materiales deben soportar impactos sin fractura frágil. Este ensayo ayuda a seleccionar aleaciones para brazos robóticos, carcasas y uniones soldadas, garantizando seguridad y durabilidad.</p>
-        </div>
+    
+    <div id="panel-educativo" class="oculto modal-movil">
+        <button id="cerrar-educativo" class="cerrar-modal">✖</button>
+        <h3>¿Qué es el ensayo Charpy?</h3>
+        <p>Mide la energía absorbida por un material al romperse de un solo golpe con un péndulo normalizado.</p>
+        <p><strong>Fórmula:</strong> E = m · g · h</p>
+        <p>Donde <em>h = L(1 − cos θ)</em>. La resiliencia es <em>R = E / A</em> (área bajo entalla).</p>
+        <h4>🤖 Aplicación en robótica</h4>
+        <p>En robótica industrial, los materiales deben soportar impactos sin fractura frágil. Este ensayo ayuda a seleccionar aleaciones para brazos robóticos, carcasas y uniones soldadas, garantizando seguridad y durabilidad.</p>
     </div>
 
-    <!-- Panel de gráfica -->
-    <div id="panel-grafica" class="oculto">
+    
+    <div id="panel-grafica" class="oculto modal-movil">
+        <button id="btn-cerrar-grafica" class="cerrar-modal">✖</button>
         <canvas id="grafica-canvas" width="400" height="300"></canvas>
-        <button id="btn-cerrar-grafica" class="btn-secundario">Cerrar</button>
     </div>
 
-    <!-- Calibración del impacto (oculto) -->
-    <div id="panel-calibracion" class="oculto">
+   
+    <div id="panel-calibracion" class="oculto escritorio-solo">
         <label>Instante del impacto (s): <span id="valor-impacto">4.585</span></label>
         <input type="range" id="slider-impacto" min="0" max="9.17" value="4.585" step="0.001">
         <button id="btn-aplicar-calibracion">Aplicar</button>
     </div>
 
-    <!-- Script para toggle del panel en móvil -->
+    
     <script>
         (function() {
-            const panel = document.getElementById('panel-control');
-            const toggleBtn = document.getElementById('btn-toggle-panel');
-            if (panel && toggleBtn) {
-                toggleBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    panel.classList.toggle('expandido');
+            const panelCtrl = document.getElementById('panel-control');
+            const btnAbrir = document.getElementById('btn-abrir-controles');
+            const btnCerrar = document.getElementById('btn-cerrar-controles');
+
+            if (btnAbrir && btnCerrar && panelCtrl) {
+                btnAbrir.addEventListener('click', () => panelCtrl.classList.add('visible'));
+                btnCerrar.addEventListener('click', () => panelCtrl.classList.remove('visible'));
+                // Cerrar al hacer clic fuera (opcional)
+                panelCtrl.addEventListener('click', (e) => {
+                    if (e.target === panelCtrl) panelCtrl.classList.remove('visible');
                 });
             }
         })();
     </script>
 
-    <!-- Librerías externas -->
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="module" src="js/main.js"></script>
