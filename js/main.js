@@ -23,22 +23,24 @@ let longitudBrazo = 1.2;
 let ensayando = false;
 let ultimoEnsayo = null;
 const clock = new THREE.Clock();
+let contenedor;   // referencia al div #contenedor-3d
 
 async function init() {
+    contenedor = document.getElementById('contenedor-3d');
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(contenedor.clientWidth, contenedor.clientHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    document.getElementById('contenedor-3d').appendChild(renderer.domElement);
+    contenedor.appendChild(renderer.domElement);
 
     escena = new THREE.Scene();
     escena.background = new THREE.Color(0xdae1e7);
     escena.environment = crearEntorno(renderer);
 
-    camara = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camara = new THREE.PerspectiveCamera(45, contenedor.clientWidth / contenedor.clientHeight, 0.1, 100);
     camara.position.set(3.5, 2.2, 5.5);
 
     controls = new OrbitControls(camara, renderer.domElement);
@@ -234,7 +236,7 @@ async function iniciarEnsayo() {
     ensayando = true;
     document.getElementById('btn-iniciar').disabled = true;
 
-    // Notificar que empieza el ensayo (para plegar el panel en móvil)
+    // Evento para plegar el panel (mantenemos compatibilidad)
     window.dispatchEvent(new CustomEvent('ensayoIniciado'));
 
     const eIni = calcularEnergiaInicial(anguloInicial);
@@ -260,7 +262,6 @@ async function iniciarEnsayo() {
 
         updateChart(`${matSel.nombre}`, absorbida);
 
-        // Notificar que terminó el ensayo (por si quieres expandir el panel otra vez)
         window.dispatchEvent(new CustomEvent('ensayoTerminado'));
 
         document.getElementById('btn-iniciar').disabled = false;
@@ -278,9 +279,12 @@ function reiniciar() {
 }
 
 window.addEventListener('resize', () => {
-    camara.aspect = window.innerWidth / window.innerHeight;
+    if (!contenedor) return;
+    const w = contenedor.clientWidth;
+    const h = contenedor.clientHeight;
+    camara.aspect = w / h;
     camara.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(w, h);
 });
 
 init().catch(console.error);

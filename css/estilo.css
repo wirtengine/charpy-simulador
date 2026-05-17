@@ -16,16 +16,16 @@
 
 body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    overflow: hidden;
     background: var(--fondo);
     color: var(--texto);
     -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
 }
 
-/* --- BARRA SUPERIOR --- */
+/* --- BARRA SUPERIOR (común) --- */
 #barra-superior {
-    position: absolute;
-    top: 0; left: 0; right: 0;
+    position: relative;
     height: 52px;
     background: linear-gradient(180deg, rgba(12,15,22,0.95) 0%, rgba(18,22,33,0.8) 100%);
     backdrop-filter: blur(15px);
@@ -36,6 +36,7 @@ body {
     padding: 0 20px;
     z-index: 100;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    flex-shrink: 0;
 }
 .logo-simulador {
     display: flex;
@@ -70,70 +71,75 @@ body {
     transform: translateY(-1px);
 }
 
-/* --- CONTENEDOR 3D --- */
+/* --- CONTENEDOR 3D (ESCRITORIO) --- */
 #contenedor-3d {
     position: absolute;
-    inset: 0;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 1;
 }
 
-/* --- PANEL DE CONTROL (CAJÓN RETRÁCTIL en móvil, FIJO en escritorio) --- */
+/* --- PANEL DE CONTROL (ESCRITORIO) --- */
 #panel-control {
     position: absolute;
+    top: 75px;
+    right: 20px;
+    width: 310px;
+    max-height: calc(100vh - 100px);
     background: var(--panel-bg);
     backdrop-filter: blur(28px);
     border-radius: var(--radio);
     box-shadow: var(--sombra), 0 0 0 1px var(--borde);
     z-index: 50;
-    transition: all var(--transicion);
-    overflow-y: auto;
     padding: 22px 20px;
-}
-/* Escritorio: flotante a la derecha */
-@media (min-width: 769px) {
-    #panel-control {
-        top: 75px;
-        right: 20px;
-        width: 310px;
-        max-height: calc(100vh - 100px);
-    }
-    .asa-cajon { display: none; }
+    overflow-y: auto;
+    transition: box-shadow 0.3s;
 }
 
-/* Móvil: cajón inferior */
-@media (max-width: 768px) {
-    #panel-control {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 35vh;           /* Altura reducida por defecto */
-        border-radius: var(--radio) var(--radio) 0 0;
-        padding: 12px 15px 0;
-        transform: translateY(0);
-    }
-    #panel-control.expandido {
-        height: 85vh;           /* Expandido para configuración */
-    }
-    .asa-cajon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 8px 0;
-        color: var(--acento);
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        user-select: none;
-        border-bottom: 1px solid var(--borde);
-        margin-bottom: 10px;
-    }
-    .icono-asa { font-size: 1.2rem; }
+/* --- PANELES FLOTANTES (educativo, gráfica, calibración) --- */
+#panel-educativo,
+#panel-grafica,
+#panel-calibracion {
+    position: absolute;
+    background: var(--panel-bg);
+    backdrop-filter: blur(28px);
+    border-radius: var(--radio);
+    padding: 20px;
+    z-index: 60;
+    box-shadow: var(--sombra), 0 0 0 1px var(--borde);
+    color: var(--texto);
+    max-width: 90vw;
+}
+/* Escritorio: posiciones fijas */
+#panel-educativo {
+    top: 75px;
+    left: 20px;
+    width: 330px;
+}
+#panel-grafica {
+    bottom: 20px;
+    left: 20px;
+    width: 400px;
+}
+#panel-calibracion {
+    bottom: 20px;
+    left: 20px;
+    width: 280px;
+}
+/* Botón de cerrar */
+.cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 1.2rem;
+    color: #ff7b7b;
+    cursor: pointer;
+    z-index: 5;
 }
 
-/* --- ESTILOS INTERNOS COMUNES --- */
+/* --- ESTILOS INTERNOS COMUNES (inputs, botones, etc.) --- */
 h2, h3 { margin-bottom: 16px; color: #fff; font-weight: 600; }
 .selector, .slider { margin-bottom: 14px; }
 label {
@@ -254,34 +260,84 @@ input[type="number"] {
 
 .oculto { display: none !important; }
 
-/* --- MODALES MÓVILES (educativo, gráfica) --- */
-.modal-movil {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--panel-bg);
-    backdrop-filter: blur(28px);
-    z-index: 200;
-    padding: 30px 20px;
-    overflow-y: auto;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--transicion), visibility var(--transicion);
-}
-.modal-movil.visible {
-    opacity: 1;
-    visibility: visible;
-}
-.cerrar-modal {
-    position: absolute;
-    top: 15px; right: 15px;
-    font-size: 1.5rem;
-    color: #ff7b7b;
-    cursor: pointer;
-}
-
-/* --- AJUSTES FINOS --- */
+/* --- MÓVIL (hasta 768px): Split vertical + paneles flotantes pequeños --- */
 @media (max-width: 768px) {
-    .autores { display: none; } /* Solo logo en móvil */
-    #panel-calibracion { display: none; }
-    input[type="number"] { width: 60px; }
+    body {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #barra-superior {
+        height: 48px;
+    }
+
+    #contenedor-3d {
+        position: relative;
+        top: 0;
+        flex: 1;
+        width: 100%;
+        z-index: 1;
+    }
+
+    #panel-control {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        height: 35vh;
+        max-height: none;
+        border-radius: var(--radio) var(--radio) 0 0;
+        box-shadow: var(--sombra);
+        margin-top: 0;
+        z-index: 50;
+        padding: 15px 15px 25px;
+    }
+
+    .autores {
+        display: none;
+    }
+
+    input[type="number"] {
+        width: 60px;
+    }
+
+    /* Paneles flotantes: en móvil, pequeños, centrados abajo o a la derecha */
+    #panel-educativo,
+    #panel-grafica,
+    #panel-calibracion {
+        position: fixed;
+        max-width: 85vw;
+        max-height: 60vh;
+        overflow-y: auto;
+        border-radius: 14px;
+        padding: 15px;
+        z-index: 70;
+    }
+
+    #panel-educativo {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        max-height: 70vh;
+    }
+
+    #panel-grafica {
+        bottom: 45vh;  /* justo por encima del panel de control */
+        right: 10px;
+        width: 280px;
+    }
+
+    #panel-calibracion {
+        bottom: 45vh;
+        right: 10px;
+        width: 260px;
+    }
+
+    /* Ajuste del canvas de gráfica para que quepa */
+    #grafica-canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
 }
