@@ -233,6 +233,10 @@ async function iniciarEnsayo() {
     if (ensayando) return;
     ensayando = true;
     document.getElementById('btn-iniciar').disabled = true;
+
+    // Notificar que empieza el ensayo (para plegar el panel en móvil)
+    window.dispatchEvent(new CustomEvent('ensayoIniciado'));
+
     const eIni = calcularEnergiaInicial(anguloInicial);
     document.getElementById('e-inicial').textContent = eIni.toFixed(2) + ' J';
 
@@ -255,6 +259,10 @@ async function iniciarEnsayo() {
         };
 
         updateChart(`${matSel.nombre}`, absorbida);
+
+        // Notificar que terminó el ensayo (por si quieres expandir el panel otra vez)
+        window.dispatchEvent(new CustomEvent('ensayoTerminado'));
+
         document.getElementById('btn-iniciar').disabled = false;
         ensayando = false;
     });

@@ -20,7 +20,7 @@
     
     <div id="barra-superior">
         <div class="logo-simulador">
-            <span class="icono">⚙️</span>
+            <span class="icono"></span>
             <span class="titulo-sim">CharpyLab</span>
         </div>
         <div class="autores">
@@ -31,15 +31,15 @@
         </div>
     </div>
 
-  
+    
     <div id="contenedor-3d"></div>
 
     
-    <button id="btn-abrir-controles" class="fab"></button>
-
-    
-    <div id="panel-control" class="modal-movil">
-        <button id="btn-cerrar-controles" class="cerrar-modal">✖</button>
+    <div id="panel-control">
+        <div class="asa-cajon" id="asa-cajon">
+            <span class="icono-asa">▲</span>
+            <span class="texto-asa">Controles</span>
+        </div>
         <h2>🔬 Ensayo Charpy</h2>
 
         <div class="selector">
@@ -111,7 +111,7 @@
 
     
     <div id="panel-educativo" class="oculto modal-movil">
-        <button id="cerrar-educativo" class="cerrar-modal">✖</button>
+        <span id="cerrar-educativo" class="cerrar-modal">✖</span>
         <h3>¿Qué es el ensayo Charpy?</h3>
         <p>Mide la energía absorbida por un material al romperse de un solo golpe con un péndulo normalizado.</p>
         <p><strong>Fórmula:</strong> E = m · g · h</p>
@@ -120,13 +120,13 @@
         <p>En robótica industrial, los materiales deben soportar impactos sin fractura frágil. Este ensayo ayuda a seleccionar aleaciones para brazos robóticos, carcasas y uniones soldadas, garantizando seguridad y durabilidad.</p>
     </div>
 
-    
+   
     <div id="panel-grafica" class="oculto modal-movil">
-        <button id="btn-cerrar-grafica" class="cerrar-modal">✖</button>
+        <span id="btn-cerrar-grafica" class="cerrar-modal">✖</span>
         <canvas id="grafica-canvas" width="400" height="300"></canvas>
     </div>
 
-   
+    
     <div id="panel-calibracion" class="oculto escritorio-solo">
         <label>Instante del impacto (s): <span id="valor-impacto">4.585</span></label>
         <input type="range" id="slider-impacto" min="0" max="9.17" value="4.585" step="0.001">
@@ -136,22 +136,41 @@
     
     <script>
         (function() {
-            const panelCtrl = document.getElementById('panel-control');
-            const btnAbrir = document.getElementById('btn-abrir-controles');
-            const btnCerrar = document.getElementById('btn-cerrar-controles');
+            const panel = document.getElementById('panel-control');
+            const asa = document.getElementById('asa-cajon');
+            const iconoAsa = asa.querySelector('.icono-asa');
+            let expandido = false;
 
-            if (btnAbrir && btnCerrar && panelCtrl) {
-                btnAbrir.addEventListener('click', () => panelCtrl.classList.add('visible'));
-                btnCerrar.addEventListener('click', () => panelCtrl.classList.remove('visible'));
-                // Cerrar al hacer clic fuera (opcional)
-                panelCtrl.addEventListener('click', (e) => {
-                    if (e.target === panelCtrl) panelCtrl.classList.remove('visible');
-                });
+            // Función para alternar altura del cajón
+            function togglePanel() {
+                expandido = !expandido;
+                if (expandido) {
+                    panel.classList.add('expandido');
+                    iconoAsa.textContent = '▼';
+                } else {
+                    panel.classList.remove('expandido');
+                    iconoAsa.textContent = '▲';
+                }
             }
+
+          
+            asa.addEventListener('click', togglePanel);
+            asa.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                togglePanel();
+            });
+
+            // Al iniciar ensayo, plegar panel automáticamente (solo en móvil)
+            window.addEventListener('ensayoIniciado', () => {
+                if (window.innerWidth <= 768 && expandido) {
+                    togglePanel();
+                }
+            });
+
+          
         })();
     </script>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="module" src="js/main.js"></script>

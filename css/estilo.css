@@ -70,69 +70,81 @@ body {
     transform: translateY(-1px);
 }
 
-/* --- CONTENEDOR 3D (SIEMPRE VISIBLE) --- */
+/* --- CONTENEDOR 3D --- */
 #contenedor-3d {
     position: absolute;
     inset: 0;
     z-index: 1;
 }
 
-/* --- BOTÓN FLOTANTE (solo móvil) --- */
-.fab {
-    display: none;
+/* --- PANEL DE CONTROL (CAJÓN RETRÁCTIL en móvil, FIJO en escritorio) --- */
+#panel-control {
     position: absolute;
-    bottom: 25px;
-    right: 25px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--acento);
-    color: #fff;
-    font-size: 1.5rem;
-    border: none;
-    box-shadow: 0 8px 20px rgba(255,140,66,0.5);
-    z-index: 200;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-.fab:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 28px rgba(255,140,66,0.7);
-}
-
-/* --- MODALES MÓVILES (y paneles en escritorio) --- */
-.modal-movil {
     background: var(--panel-bg);
     backdrop-filter: blur(28px);
     border-radius: var(--radio);
     box-shadow: var(--sombra), 0 0 0 1px var(--borde);
-    z-index: 150;
-    position: absolute;
-    transition: opacity var(--transicion), transform var(--transicion);
-}
-/* En escritorio, los paneles se muestran normalmente */
-#panel-control {
-    top: 75px; right: 20px;
-    width: 310px;
-    max-height: calc(100vh - 100px);
-    padding: 22px 20px;
+    z-index: 50;
+    transition: all var(--transicion);
     overflow-y: auto;
+    padding: 22px 20px;
 }
-#panel-educativo {
-    top: 75px; left: 20px;
-    width: 320px;
-    padding: 20px;
+/* Escritorio: flotante a la derecha */
+@media (min-width: 769px) {
+    #panel-control {
+        top: 75px;
+        right: 20px;
+        width: 310px;
+        max-height: calc(100vh - 100px);
+    }
+    .asa-cajon { display: none; }
 }
-#panel-grafica {
-    bottom: 20px; left: 20px;
-    padding: 20px;
-}
-.cerrar-modal { display: none; } /* ocultos en escritorio */
 
-/* Estilos internos (inputs, botones, etc.) */
-h2, h3 { margin-bottom: 16px; color: #fff; }
+/* Móvil: cajón inferior */
+@media (max-width: 768px) {
+    #panel-control {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 35vh;           /* Altura reducida por defecto */
+        border-radius: var(--radio) var(--radio) 0 0;
+        padding: 12px 15px 0;
+        transform: translateY(0);
+    }
+    #panel-control.expandido {
+        height: 85vh;           /* Expandido para configuración */
+    }
+    .asa-cajon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 0;
+        color: var(--acento);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        border-bottom: 1px solid var(--borde);
+        margin-bottom: 10px;
+    }
+    .icono-asa { font-size: 1.2rem; }
+}
+
+/* --- ESTILOS INTERNOS COMUNES --- */
+h2, h3 { margin-bottom: 16px; color: #fff; font-weight: 600; }
 .selector, .slider { margin-bottom: 14px; }
-label { font-size: 0.7rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+label {
+    display: block;
+    font-size: 0.7rem;
+    margin-bottom: 5px;
+    color: var(--texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
 select {
     width: 100%;
     background: rgba(255,255,255,0.06);
@@ -153,84 +165,123 @@ select:focus { border-color: var(--acento); }
 select option, select optgroup { background: #1a1e2b !important; color: #fff !important; }
 select optgroup { color: var(--acento) !important; font-weight: bold; }
 
-input[type="range"] { width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 5px; -webkit-appearance: none; }
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--acento); border-radius: 50%; cursor: pointer; }
+input[type="range"] {
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    height: 6px;
+    border-radius: 5px;
+    -webkit-appearance: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--acento);
+    border-radius: 50%;
+    cursor: pointer;
+}
 input[type="number"] {
-    width: 70px; background: rgba(255,255,255,0.06); border: 1px solid var(--borde); border-radius: 8px;
-    color: white; padding: 6px 8px; font-size: 0.8rem; text-align: center;
+    width: 70px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    color: white;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    text-align: center;
 }
 .input-group { display: flex; align-items: center; gap: 8px; }
 .input-group input[type="range"] { flex: 1; }
 
 .btn-primario, .btn-secundario {
-    width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: 600; font-size: 0.95rem;
-    cursor: pointer; margin-top: 8px; letter-spacing: 0.3px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: 0.3px;
 }
-.btn-primario { background: linear-gradient(135deg, var(--acento), #e67e22); color: #fff; box-shadow: 0 8px 18px rgba(255,140,66,0.35); }
-.btn-primario:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(255,140,66,0.5); }
-.btn-secundario { background: rgba(255,255,255,0.08); color: var(--texto); backdrop-filter: blur(4px); }
+.btn-primario {
+    background: linear-gradient(135deg, var(--acento), #e67e22);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(255,140,66,0.35);
+}
+.btn-primario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(255,140,66,0.5);
+}
+.btn-secundario {
+    background: rgba(255,255,255,0.08);
+    color: var(--texto);
+    backdrop-filter: blur(4px);
+}
 .btn-secundario:hover { background: rgba(255,255,255,0.18); }
 
-#resultados { margin-top: 22px; padding: 14px; background: rgba(255,255,255,0.04); border-radius: 14px; border: 1px solid var(--borde); }
-#resultados h3 { font-size: 0.75rem; color: var(--texto-secundario); margin-bottom: 12px; }
-.fila { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
+#resultados {
+    margin-top: 22px;
+    padding: 14px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    border: 1px solid var(--borde);
+}
+#resultados h3 {
+    font-size: 0.75rem;
+    color: var(--texto-secundario);
+    margin-bottom: 12px;
+}
+.fila {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
 .valor { font-weight: 700; color: var(--acento-2); }
+
 .botones-extra { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .botones-extra button {
-    flex: 1; padding: 7px 4px; font-size: 0.7rem; background: rgba(255,255,255,0.05); border: 1px solid var(--borde);
-    color: var(--texto); border-radius: 8px; cursor: pointer;
+    flex: 1;
+    padding: 7px 4px;
+    font-size: 0.7rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--borde);
+    color: var(--texto);
+    border-radius: 8px;
+    cursor: pointer;
 }
+
 .oculto { display: none !important; }
 
-/* --- COMPORTAMIENTO RESPONSIVE --- */
+/* --- MODALES MÓVILES (educativo, gráfica) --- */
+.modal-movil {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--panel-bg);
+    backdrop-filter: blur(28px);
+    z-index: 200;
+    padding: 30px 20px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transicion), visibility var(--transicion);
+}
+.modal-movil.visible {
+    opacity: 1;
+    visibility: visible;
+}
+.cerrar-modal {
+    position: absolute;
+    top: 15px; right: 15px;
+    font-size: 1.5rem;
+    color: #ff7b7b;
+    cursor: pointer;
+}
+
+/* --- AJUSTES FINOS --- */
 @media (max-width: 768px) {
     .autores { display: none; } /* Solo logo en móvil */
-    .fab { display: block; }
-
-    /* Convertir paneles en modales ocultos por defecto */
-    #panel-control, #panel-educativo, #panel-grafica {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        width: 100%;
-        max-height: 100vh;
-        border-radius: 0;
-        opacity: 0;
-        visibility: hidden;
-        transform: scale(0.95);
-        z-index: 150;
-        padding: 30px 20px 40px;
-        overflow-y: auto;
-    }
-    /* Cuando tengan la clase .visible se muestran */
-    #panel-control.visible, #panel-educativo.visible, #panel-grafica.visible {
-        opacity: 1;
-        visibility: visible;
-        transform: scale(1);
-    }
-
-    /* Botón cerrar modal visible */
-    .cerrar-modal {
-        display: block;
-        position: absolute;
-        top: 15px; right: 15px;
-        background: none;
-        border: none;
-        color: var(--texto);
-        font-size: 1.5rem;
-        cursor: pointer;
-        z-index: 10;
-    }
-
-    /* El botón de cerrar de cada panel */
-    #panel-control .cerrar-modal { display: block; }
-    #panel-educativo .cerrar-modal { display: block; }
-    #panel-grafica .cerrar-modal { display: block; }
-
-    /* Ocultar botón flotante cuando un modal está abierto */
-    .fab.oculto { display: none; }
-
-    /* Ajustes de inputs para móvil */
+    #panel-calibracion { display: none; }
     input[type="number"] { width: 60px; }
-    .input-group { gap: 5px; }
-    #panel-calibracion { display: none; } /* Ocultar calibración en móvil */
 }
