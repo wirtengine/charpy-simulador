@@ -51,14 +51,7 @@ body {
     font-size: 1.5rem;
     filter: drop-shadow(0 0 6px var(--acento));
 }
-.autores {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    /* En móvil permitimos scroll horizontal si no caben */
-    overflow-x: auto;
-    white-space: nowrap;
-}
+.autores { display: flex; gap: 8px; flex-wrap: wrap; }
 .badge {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
@@ -144,7 +137,7 @@ body {
     z-index: 5;
 }
 
-/* --- ESTILOS INTERNOS COMUNES --- */
+/* --- ESTILOS INTERNOS COMUNES (inputs, botones, etc.) --- */
 h2, h3 { margin-bottom: 16px; color: #fff; font-weight: 600; }
 .selector, .slider { margin-bottom: 14px; }
 label {
@@ -265,7 +258,7 @@ input[type="number"] {
 
 .oculto { display: none !important; }
 
-/* --- MÓVIL (hasta 768px) --- */
+/* --- MÓVIL (hasta 768px): Split vertical + autores en línea + panel más espacioso --- */
 @media (max-width: 768px) {
     body {
         display: flex;
@@ -274,20 +267,27 @@ input[type="number"] {
     }
 
     #barra-superior {
-        height: 48px;
+        height: auto;
+        min-height: 48px;
+        padding: 6px 12px;
+        gap: 8px;
     }
 
-    /* Ajuste de autores: se mantienen visibles, con scroll si es necesario */
     .autores {
+        display: flex;
+        flex-wrap: nowrap;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        max-width: 60%;
-        gap: 4px;
+        gap: 6px;
+        padding-bottom: 4px;
     }
     .badge {
+        white-space: nowrap;
         font-size: 0.6rem;
         padding: 2px 8px;
+        flex-shrink: 0;
     }
+    .autores::-webkit-scrollbar { display: none; }
 
     #contenedor-3d {
         position: relative;
@@ -302,14 +302,28 @@ input[type="number"] {
         top: auto;
         right: auto;
         width: 100%;
-        height: 38vh;               /* Un poco más alto para que los botones quepan */
-        max-height: none;
+        height: auto;                    /* altura flexible */
+        max-height: 60vh;                /* un poco más de espacio */
         border-radius: var(--radio) var(--radio) 0 0;
         box-shadow: var(--sombra);
         margin-top: 0;
         z-index: 50;
-        padding: 15px 15px 20px;
+        padding: 15px 15px 35px;         /* más padding inferior para que los botones no se corten */
+        overflow-y: auto;
     }
+
+    /* Reducir ligeramente los márgenes internos para que quepa mejor */
+    #panel-control h2 { margin-bottom: 10px; font-size: 1.1rem; }
+    .selector, .slider { margin-bottom: 10px; }
+    #resultados { margin-top: 14px; padding: 10px; }
+    .fila { margin-bottom: 6px; font-size: 0.8rem; }
+
+    .botones-extra {
+        margin-top: 16px;
+        margin-bottom: 10px;             /* asegura que no se corten */
+    }
+
+    input[type="number"] { width: 60px; }
 
     /* Paneles flotantes en móvil */
     #panel-educativo,
@@ -333,13 +347,13 @@ input[type="number"] {
     }
 
     #panel-grafica {
-        bottom: 40vh;  /* justo por encima del panel de control */
+        bottom: 35vh;   /* más arriba para que no tape los botones */
         right: 10px;
         width: 280px;
     }
 
     #panel-calibracion {
-        bottom: 40vh;
+        bottom: 35vh;
         right: 10px;
         width: 260px;
     }
@@ -347,9 +361,5 @@ input[type="number"] {
     #grafica-canvas {
         width: 100% !important;
         height: auto !important;
-    }
-
-    input[type="number"] {
-        width: 60px;
     }
 }
