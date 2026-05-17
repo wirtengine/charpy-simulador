@@ -22,8 +22,8 @@ export function energiaMaximaMaterial(material) {
 
 export function determinarTipoFractura(material) {
     const r = material.resiliencia;
-    if (r < 30) return 'Frágil';
-    if (r < 80) return 'Mixta';
+    if (r < 0.5) return 'Frágil';
+    if (r < 1.0) return 'Mixta';
     return 'Dúctil';
 }
 
