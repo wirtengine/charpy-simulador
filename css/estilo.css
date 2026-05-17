@@ -83,7 +83,33 @@ body {
     z-index: 1;
 }
 
-/* --- PANEL DE CONTROL --- */
+/* --- BOTÓN TOGGLE (solo visible en móvil) --- */
+.btn-toggle {
+    display: none;
+    position: absolute;
+    top: -30px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--panel-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--borde);
+    color: var(--texto);
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 101;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transicion);
+}
+.btn-toggle:hover {
+    background: rgba(255,140,66,0.2);
+    border-color: var(--acento);
+}
+
+/* --- PANEL DE CONTROL (ESCRITORIO) --- */
 #panel-control {
     position: absolute;
     top: 75px;
@@ -97,7 +123,7 @@ body {
     z-index: 10;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
-    transition: box-shadow 0.3s;
+    transition: box-shadow 0.3s, transform 0.3s, max-height 0.3s;
 }
 #panel-control:hover {
     box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.15);
@@ -127,7 +153,7 @@ label {
     font-weight: 600;
 }
 
-/* SELECT PERSONALIZADO OSCURO (CATEGORÍAS LEGIBLES) */
+/* SELECT PERSONALIZADO OSCURO */
 select {
     width: 100%;
     background: rgba(255,255,255,0.06);
@@ -151,22 +177,17 @@ select:focus {
     border-color: var(--acento);
     background-color: rgba(255,255,255,0.1);
 }
-
-/* Opciones y grupos con fondo oscuro garantizado */
 select option {
     background: #1a1e2b !important;
     color: #fff !important;
     padding: 8px;
 }
-
 select optgroup {
     background: #151820 !important;
     color: var(--acento) !important;
     font-weight: bold;
     font-style: normal;
 }
-
-/* Regla extra para navegadores que heredan mal */
 select optgroup option {
     background: #1a1e2b !important;
     color: #fff !important;
@@ -339,33 +360,63 @@ input[type="number"]:focus {
     width: 280px;
 }
 
-/* --- RESPONSIVE --- */
+/* --- RESPONSIVE MÓVIL --- */
 @media (max-width: 768px) {
     #barra-superior {
         height: auto;
         flex-direction: column;
         align-items: flex-start;
-        padding: 10px 15px;
-        gap: 8px;
+        padding: 8px 12px;
+        gap: 6px;
     }
     .autores {
         justify-content: flex-start;
         gap: 4px;
+        overflow-x: auto;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
     }
     .badge {
-        font-size: 0.65rem;
-        padding: 2px 8px;
+        font-size: 0.6rem;
+        padding: 2px 6px;
     }
 
+    /* El panel se convierte en cajón inferior */
     #panel-control {
+        position: absolute;
         top: auto;
         bottom: 0;
         right: 0;
         left: 0;
         width: 100%;
-        max-height: 45vh;
+        max-height: 40vh;
         border-radius: var(--radio) var(--radio) 0 0;
-        padding: 16px;
+        padding: 12px 15px;
+        transform: translateY(0);
+        transition: max-height 0.3s ease, padding 0.3s;
+        overflow-y: auto;
+        z-index: 50;
+    }
+
+    /* Estado expandido (casi toda la pantalla) */
+    #panel-control.expandido {
+        max-height: 82vh;
+        padding-bottom: 30px;
+    }
+
+    /* Botón toggle visible */
+    .btn-toggle {
+        display: flex;
+    }
+
+    /* Ajustar inputs para táctiles */
+    input[type="number"] {
+        width: 55px;
+        padding: 8px 4px;
+        font-size: 0.75rem;
+    }
+    .input-group {
+        gap: 5px;
     }
 
     #panel-educativo {
@@ -373,14 +424,14 @@ input[type="number"]:focus {
         top: 60px;
         width: calc(100% - 20px);
     }
-
     #panel-grafica {
         left: 10px;
         bottom: 50px;
         width: calc(100% - 20px);
     }
-
-    input[type="number"] {
-        width: 60px;
+    #panel-calibracion {
+        left: 10px;
+        bottom: 50px;
+        width: calc(100% - 20px);
     }
 }

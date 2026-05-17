@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CharpyLab · Simulador de Ensayo Charpy 3D</title>
-    
     <link rel="icon" type="image/x-icon" href="logo.ico">
     <link rel="stylesheet" href="css/estilo.css">
     <script type="importmap">
@@ -18,10 +17,10 @@
 </head>
 <body>
 
-    
+    <!-- Barra superior con identidad y autores -->
     <div id="barra-superior">
         <div class="logo-simulador">
-            <span class="icono"></span>
+            <span class="icono">⚙️</span>
             <span class="titulo-sim">CharpyLab</span>
         </div>
         <div class="autores">
@@ -32,11 +31,12 @@
         </div>
     </div>
 
-    
+    <!-- Contenedor 3D (siempre detrás) -->
     <div id="contenedor-3d"></div>
 
-    
+    <!-- Panel de control (cajón abajo en móvil) -->
     <div id="panel-control">
+        <button id="btn-toggle-panel" class="btn-toggle" aria-label="Expandir panel">▲</button>
         <h2>🔬 Ensayo Charpy</h2>
 
         <div class="selector">
@@ -106,7 +106,7 @@
         </div>
     </div>
 
-   
+    <!-- Panel educativo -->
     <div id="panel-educativo" class="oculto">
         <div class="contenido-educativo">
             <span id="cerrar-educativo" class="cerrar">✖</span>
@@ -119,7 +119,7 @@
         </div>
     </div>
 
-    
+    <!-- Panel de gráfica -->
     <div id="panel-grafica" class="oculto">
         <canvas id="grafica-canvas" width="400" height="300"></canvas>
         <button id="btn-cerrar-grafica" class="btn-secundario">Cerrar</button>
@@ -132,7 +132,21 @@
         <button id="btn-aplicar-calibracion">Aplicar</button>
     </div>
 
-    
+    <!-- Script para toggle del panel en móvil -->
+    <script>
+        (function() {
+            const panel = document.getElementById('panel-control');
+            const toggleBtn = document.getElementById('btn-toggle-panel');
+            if (panel && toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    panel.classList.toggle('expandido');
+                });
+            }
+        })();
+    </script>
+
+    <!-- Librerías externas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="module" src="js/main.js"></script>
